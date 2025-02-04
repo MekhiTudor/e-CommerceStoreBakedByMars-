@@ -2,9 +2,9 @@ from django.urls import path # type: ignore
 from . import views
 
 urlpatterns = [
-    path('home/',views.home, name = 'home'),
-    path('api/products/', views.get_products, name='get_products'),
-    path('login/',views.login_user, name = 'login'),
-    path('logout/',views.logout_user, name = 'logout'),
-    path('register/',views.register_user, name = 'register')
+    path('api/get_products/', views.get_products, name='get_products'),
+    path('api/get_product/', views.get_product, name='get_product'),
+    path('api/login/',views.login_user, name = 'login'),
+    path('api/logout/',views.logout_user, name = 'logout'),
+    path('api/register/',views.register_user, name = 'register')
 ]
