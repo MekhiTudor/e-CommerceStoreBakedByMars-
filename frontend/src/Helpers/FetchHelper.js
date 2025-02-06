@@ -1,9 +1,9 @@
-export async function fetchHelper(
+export const fetchHelper = async (
   url,
   method = "GET",
   data = null,
   headers = {}
-) {
+) => {
   const defaultHeaders = {
     "Content-Type": "application/json",
     ...headers,
@@ -31,4 +31,4 @@ export async function fetchHelper(
     console.error("Fetch Error:", error);
     throw error;
   }
-}
+};

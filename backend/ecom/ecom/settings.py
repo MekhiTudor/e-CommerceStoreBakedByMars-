@@ -28,9 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'store',
     'cart',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+     "corsheaders.middleware.CorsMiddleware",  
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -38,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'ecom.urls'
@@ -121,3 +125,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ##extending User
 
 AUTH_USER_MODEL = 'store.User'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Allow Vite frontend
+]
