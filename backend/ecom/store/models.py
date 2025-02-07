@@ -42,17 +42,22 @@ class Product(models.Model):
 
 #customers orders
 class Order(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    address = models.CharField(max_length=100, default="",blank=True)
+    address = models.CharField(max_length=100, default="", blank=True)
     phone = models.CharField(max_length=20, default="", blank=True)
     email = models.EmailField(max_length=100, default="", blank=True)
     date = models.DateField(default=datetime.datetime.today)
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.product}'
+        return f'Order {self.id} by {self.user.username}'
 
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f'{self.quantity} x {self.product.name}'
 
 
