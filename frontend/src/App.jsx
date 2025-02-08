@@ -9,7 +9,7 @@ import { FlavorsPage } from "./Pages/flavorsPage";
 import { PurchasePage } from "./Pages/PurchasePage";
 import { ShoppingCartPage } from "./Pages/ShoppingCartPage";
 import { Routes, Route } from "react-router-dom";
-import Page from "./Pages/OrderPage";
+import OrderPage from "./Pages/OrderPage";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,7 +21,7 @@ function App() {
         <Route path="/login" element={<Login />}></Route>
         <Route path="/register" element={<Register />}></Route>
         <Route path="/flavors" element={<FlavorsPage />}></Route>
-        <Route path="/purchase" element={<Page />}></Route>
+        <Route path="/purchase" element={<OrderPage />}></Route>
         <Route path="/cart" element={<ShoppingCartPage />}></Route>
       </Routes>
     </>
