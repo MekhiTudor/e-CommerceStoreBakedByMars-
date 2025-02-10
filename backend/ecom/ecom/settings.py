@@ -32,16 +32,16 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-     "corsheaders.middleware.CorsMiddleware",  
-    "django.middleware.common.CommonMiddleware",
+    # CorsMiddleware MUST be listed before CommonMiddleware for proper CORS header handling.
+    "corsheaders.middleware.CorsMiddleware",  # Modified: Moved to top
+    "django.middleware.common.CommonMiddleware", # Modified: Moved below CorsMiddleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
 ]
 
 ROOT_URLCONF = 'ecom.urls'
@@ -129,3 +129,12 @@ AUTH_USER_MODEL = 'store.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Allow Vite frontend
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
+CSRF_COOKIE_HTTPONLY = False  # Ensure frontend can access CSRF cookie
+CSRF_COOKIE_SECURE = True  # Set to True if using HTTPS
+CSRF_USE_SESSIONS = False  # Django should send CSRF as a cookie
+CSRF_COOKIE_DOMAIN = "127.0.0.1"
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_SAMESITE = "None" 

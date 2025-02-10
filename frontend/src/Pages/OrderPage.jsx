@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-function Page() {
+function OrderPage() {
   const [boxSize, setBoxSize] = useState(6);
   const [selectedCookies, setSelectedCookies] = useState([]);
   const [cookies, setCookies] = useState([]);
@@ -188,4 +188,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default OrderPage;

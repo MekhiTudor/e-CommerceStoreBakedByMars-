@@ -1,17 +1,61 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Register } from "./registerPage";
+import { Form, Link, useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const getCsrfToken = async () => {
+    const response = await fetch("http://127.0.0.1:8000/api/csrf/", {
+      credentials: "include", // Ensure cookies are sent
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch CSRF token");
+    }
+
+    const data = await response.json();
+    console.log("CSRF Token:", data.csrfToken);
+    return data.csrfToken;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", formData);
+
+    try {
+      const csrfToken = await getCsrfToken();
+      console.log("CSRF Token Retrieved:", csrfToken);
+      //console.log(JSON.stringify(formData));
+      const response = await fetch("http://127.0.0.1:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken, // Include CSRF token
+        },
+        credentials: "include", // Include cookies for authentication
+
+        body: JSON.stringify(formData),
+      });
+      console.log(response);
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate("/");
+        console.log("Login successful:", data);
+      } else {
+        //console.error("Error:", data.error);
+      }
+    } catch (err) {
+      console.error("Request failed:", err);
+      //console.log();
+    }
   };
 
   return (
@@ -44,6 +88,10 @@ export const Login = () => {
             Login
           </button>
         </form>
+        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+        {message && (
+          <p className="text-green-500 text-center mt-2">{message}</p>
+        )}
         <p className="text-center text-sm mt-4">
           Don't have an account?{" "}
           <Link to="/register" className="text-blue-500 hover:underline">
