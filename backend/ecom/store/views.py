@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404 # type: ignore
 from django.http import JsonResponse # type: ignore
 from .models import Product, User, Order, OrderItem, Product
+from cart.models import Cart
+
 from django.contrib.auth import authenticate, login, logout # type: ignore
 from django.contrib import messages # type: ignore
 import json
@@ -46,26 +48,30 @@ def get_products(request):
 
 
 
+@api_view(["POST"])
 def login_user(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
+    """
+    Authenticates the user.
+    Expects a JSON payload with 'username' and 'password'.
+    On success, logs in the user and returns a success message.
+    """
+    try:
+        data = json.loads(request.body)
+        username = data.get("username")
+        password = data.get("password")
 
-            print("Received data:", data)  # Debugging
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            # After login, the session is set and subsequent requests will have request.user populated.
+            print(f"Session ID: {request.session.session_key}")
+            return JsonResponse({"message": "Login successful", "user": user.username}, status=200)
+        else:
+            return JsonResponse({"error": "Invalid credentials"}, status=400)
+    except Exception as e:
+        print("Error during login:", e)
+        return JsonResponse({"error": "Server error"}, status=500)
 
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return JsonResponse({"message": "Login successful", "user": user.username}, status=200)
-            else:
-                return JsonResponse({"error": "Invalid credentials"}, status=400)
-        except Exception as e:
-            print("Error:", str(e))  # Print error message
-            return JsonResponse({"error": "Server error"}, status=500)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
 def logout_user(request):
     logout(request)
@@ -94,20 +100,22 @@ def get_csrf_token(request):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])  # Ensure only logged-in users can place orders
+@permission_classes([IsAuthenticated])
 def create_order(request):
     """
     Creates a new order for the authenticated user.
-    Expects a JSON payload with 'items': [{ 'product_id': X, 'quantity': Y }]
+    Expects a JSON payload with:
+      - "items": a list of objects, each with 'product_id' and 'quantity'
+      - Optional order details: 'address', 'phone', 'email'
     """
     user = request.user
     data = request.data
 
-    # Validate required fields
+    # Validate that items are provided
     if "items" not in data or not data["items"]:
         return Response({"error": "No items in the order"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create the Order
+    # Create the Order instance for the user
     order = Order.objects.create(
         user=user,
         address=data.get("address", ""),
@@ -115,7 +123,7 @@ def create_order(request):
         email=data.get("email", ""),
     )
 
-    # Add items to the order
+    # Add each item to the order
     for item in data["items"]:
         try:
             product = Product.objects.get(id=item["product_id"])
@@ -125,6 +133,7 @@ def create_order(request):
             return Response({"error": f"Product ID {item['product_id']} not found"}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({"message": "Order created successfully", "order_id": order.id}, status=status.HTTP_201_CREATED)
+
 
 # View to update order fulfillment (only for superusers)
 @api_view(["PATCH"])
@@ -143,3 +152,9 @@ def update_order_fulfillment(request, order_id):
     order.save()
 
     return Response({"message": f"Order {order_id} fulfillment updated"}, status=status.HTTP_200_OK)
+
+
+def check_auth(request):
+    if request.user.is_authenticated:
+        return JsonResponse({"authenticated": True, "user": request.user.username})
+    return JsonResponse({"authenticated": False})

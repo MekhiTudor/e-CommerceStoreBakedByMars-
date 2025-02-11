@@ -1,9 +1,11 @@
-from django.urls import path # type: ignore
-from . import views
+# cart/urls.py
+
+from django.urls import path
+from .views import get_cart, add_to_cart, update_cart_item, remove_from_cart
 
 urlpatterns = [
-    path('', views.cart_summary, name = 'cart_summary'),
-     path('add/', views.cart_add, name = 'cart_add'),
-      path('delete/', views.cart_delete, name = 'cart_delete'),
-       path('update/', views.cart_update, name = 'cart_update'),
+    path("api/cart/", get_cart, name="get-cart"),
+    path("api/cart/add/", add_to_cart, name="add-to-cart"),
+    path("api/cart/update/<int:item_id>/", update_cart_item, name="update-cart-item"),
+    path("api/cart/remove/<int:item_id>/", remove_from_cart, name="remove-from-cart"),
 ]

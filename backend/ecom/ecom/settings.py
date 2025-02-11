@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'store',
     'cart',
     "corsheaders",
@@ -44,6 +45,11 @@ MIDDLEWARE = [
 
 ]
 
+REST_FRAMEWORK = {
+   
+    
+}
+
 ROOT_URLCONF = 'ecom.urls'
 
 TEMPLATES = [
@@ -57,7 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'cart.context_processors.cart',
+                
             ],
         },
     },
@@ -132,9 +138,10 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
-CSRF_COOKIE_HTTPONLY = False  # Ensure frontend can access CSRF cookie
+CSRF_COOKIE_HTTPONLY = True  # Ensure frontend can access CSRF cookie
 CSRF_COOKIE_SECURE = True  # Set to True if using HTTPS
 CSRF_USE_SESSIONS = False  # Django should send CSRF as a cookie
 CSRF_COOKIE_DOMAIN = "127.0.0.1"
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_SAMESITE = "None" 
+SESSION_COOKIE_HTTPONLY = True
