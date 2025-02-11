@@ -1,6 +1,8 @@
 from django.db import models # type:ignore
 import datetime
 from django.contrib.auth.models import AbstractUser  # type:ignore
+from django.utils.timezone import now
+
 
 
 # Models
@@ -44,7 +46,7 @@ class Order(models.Model):
     address = models.CharField(max_length=100, default="", blank=True)
     phone = models.CharField(max_length=20, default="", blank=True)
     email = models.EmailField(max_length=100, default="", blank=True)
-    date = models.DateField(default=datetime.today)
+    date = models.DateField(default=now)
     status = models.BooleanField(default=False)
     is_fulfilled = models.BooleanField(default=False)  # Can only be changed by superusers
 

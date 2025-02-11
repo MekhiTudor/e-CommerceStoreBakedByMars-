@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Search, User, ShoppingCart, Star, X, Plus, Minus } from "lucide-react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
+import { Search, User, ShoppingCart, X } from "lucide-react";
 import {
   Button,
   Select,
@@ -8,12 +9,25 @@ import {
   InputLabel,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { addToCart } from "../Helpers/AddToCart";
 
 function OrderPage() {
   const [boxSize, setBoxSize] = useState(6);
   const [selectedCookies, setSelectedCookies] = useState([]);
   const [cookies, setCookies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { isAuthenticated, csrfToken, getCsrfToken } = useContext(AuthContext);
+  //check auth
+
+  // Check on page load
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is logged in");
+    } else {
+      console.log("User is NOT logged in");
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/get_products/")
@@ -24,6 +38,7 @@ function OrderPage() {
       })
       .catch((error) => {
         console.error("Error fetching cookies:", error);
+        setError("Failed to load products");
         setLoading(false);
       });
   }, []);
@@ -43,6 +58,57 @@ function OrderPage() {
     const newSelection = [...selectedCookies];
     newSelection.splice(index, 1);
     setSelectedCookies(newSelection);
+  };
+
+  const handleAddToCart = async () => {
+    if (selectedCookies.length !== boxSize) {
+      console.log("Selected cookies length does not match box size");
+      return;
+    }
+
+    try {
+      console.log("Checking authentication status:", isAuthenticated);
+
+      if (!isAuthenticated) {
+        alert("You need to be logged in to add items to your cart!");
+        console.log("User is not authenticated.");
+        return;
+      }
+
+      console.log("Preparing cookies to add to cart:", selectedCookies);
+
+      // Pass the CSRF token from the context to the addToCart function
+      await addToCart(
+        selectedCookies.map((cookie) => ({ id: cookie.id, quantity: 1 })),
+        isAuthenticated,
+        csrfToken, // From AuthContext
+        getCsrfToken // From AuthContext
+      );
+
+      console.log("Cookies successfully added to cart!");
+      alert("Cookies added to cart!");
+      setSelectedCookies([]); // Clear selection after adding to cart
+    } catch (error) {
+      console.error("Error occurred while adding to cart:", error);
+
+      if (error.message.includes("CSRF")) {
+        console.log("CSRF token expired or invalid. Refreshing token...");
+        // Refresh the token if it's expired or invalid
+        await getCsrfToken();
+        console.log("New CSRF token retrieved:", csrfToken);
+
+        await addToCart(
+          selectedCookies.map((cookie) => ({ id: cookie.id, quantity: 1 })),
+          isAuthenticated,
+          csrfToken,
+          getCsrfToken
+        );
+        console.log("Cookies successfully added after CSRF refresh!");
+      } else {
+        alert("Failed to add to cart");
+        console.error("Error details:", error);
+      }
+    }
   };
 
   const isBoxFull = selectedCookies.length === boxSize;
@@ -81,6 +147,9 @@ function OrderPage() {
           >
             Baked By Mars
           </h1>
+          <p>
+            {isAuthenticated ? "User is logged in" : "User is NOT logged in"}
+          </p>
         </div>
 
         <div className="flex items-center gap-4">
@@ -179,6 +248,7 @@ function OrderPage() {
             color="primary"
             fullWidth
             disabled={!isBoxFull}
+            onClick={handleAddToCart} // Add function here
           >
             Add to Cart
           </Button>

@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { Search, User, ShoppingCart } from "lucide-react";
+import { useAuth } from "../Context/AuthContext";
+import { useContext } from "react";
 
 export const NavBar = () => {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <header className="bg-white py-4 px-6 flex items-center justify-center shadow-md fixed w-full top-0 z-50">
       <div className="flex items-center w-full max-w-5xl justify-between">
@@ -54,12 +58,21 @@ export const NavBar = () => {
           >
             <Search className="h-5 w-5 text-gray-700" />
           </Link>
-          <Link
-            to="/login"
-            className="border border-gray-400 p-2 rounded-lg hover:bg-gray-100 transition"
-          >
-            <User className="h-5 w-5 text-gray-700" />
-          </Link>
+          {isAuthenticated ? (
+            <button
+              onClick={logout}
+              className="border border-red-500 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="border border-gray-400 p-2 rounded-lg hover:bg-gray-100 transition"
+            >
+              <User className="h-5 w-5 text-gray-700" />
+            </Link>
+          )}
           <Link
             to="/cart"
             className="border border-gray-400 p-2 rounded-lg hover:bg-gray-100 transition"

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
 import { Form, Link, useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
+  const { setIsAuthenticated } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -47,6 +49,7 @@ export const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
+        setIsAuthenticated(true); // Set global auth state to true
         navigate("/");
         console.log("Login successful:", data);
       } else {
