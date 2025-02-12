@@ -1,6 +1,7 @@
-from rest_framework.decorators import api_view, permission_classes 
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response  
 from rest_framework.permissions import IsAuthenticated  
+from django.views.decorators.csrf import csrf_exempt  # Import csrf_exempt
 from .models import Cart, CartItem
 from store.models import Product
 from django.shortcuts import get_object_or_404  # type: ignore
@@ -19,15 +20,23 @@ def get_cart(request):
 # This view adds one or more items to the logged-in user's cart.
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@csrf_exempt  # Exempt CSRF check for this view
 def add_to_cart(request):
     """
     Expects a JSON payload with either:
       - A dict: { "id": <product_id>, "quantity": <quantity> } or
       - A list of such dicts.
     """
+    # Check if the user is authenticated
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "User is not authenticated"}, status=403)
+
     # Retrieve or create the cart for the logged-in user
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    print(f"User cart: {cart.id} (created: {created})")
+    try:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+    except Exception as e:
+        return JsonResponse({"error": "Failed to retrieve or create cart"}, status=500)
     
     # Get the incoming data from the request body
     items = request.data
@@ -42,11 +51,15 @@ def add_to_cart(request):
     for item in items:
         product_id = item.get("id")
         quantity = item.get("quantity", 1)
+        
         if not product_id:
-            continue  # Optionally handle the error for missing product id
+            continue  # Skip item if product_id is missing
 
         # Retrieve the product or return a 404 error if not found
-        product = get_object_or_404(Product, id=product_id)
+        try:
+            product = get_object_or_404(Product, id=product_id)
+        except Exception as e:
+            return JsonResponse({"error": f"Product with ID {product_id} not found"}, status=404)
 
         # Get or create a CartItem for the given product in the user's cart
         cart_item, item_created = CartItem.objects.get_or_create(
@@ -54,13 +67,14 @@ def add_to_cart(request):
             product=product,
             defaults={"quantity": quantity}
         )
-        if not item_created:
-            # If the item already exists, simply increment its quantity
+        
+        if item_created:
+            print(f"Created new cart item for product {product.name} with quantity {quantity}")
+        else:
             cart_item.quantity += quantity
             cart_item.save()
-
+    
     return JsonResponse({"message": "Item(s) added to cart successfully"})
-
 # This view updates the quantity of a specific cart item.
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])

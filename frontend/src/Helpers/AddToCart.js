@@ -26,20 +26,21 @@ export const addToCart = async (
     console.log("Using CSRF token:", token);
 
     const payloadItems = Array.isArray(items) ? items : [items];
-    console.log("Payload items:", payloadItems);
-
+    console.log("Payload items:", payloadItems[0]);
+    console.log("what im sending back:", JSON.stringify(payloadItems[0]));
     const response = await fetch("http://127.0.0.1:8000/api/cart/add/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": token,
       },
-      credentials: "include", // Include session cookies
       body: JSON.stringify(payloadItems),
+      credentials: "include", // Include session cookies
     });
 
     console.log("Response status:", response.status);
     console.log("Response headers:", response.headers);
+    console.log();
 
     if (!response.ok) {
       const errorDetails = await response.text();

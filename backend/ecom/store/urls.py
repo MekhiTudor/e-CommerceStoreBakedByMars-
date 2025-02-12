@@ -2,7 +2,7 @@
 
 from django.urls import path, include
 from . import views
-from .views import get_csrf_token, login_user, create_order, update_order_fulfillment, check_auth
+from .views import get_csrf_token, login_user, create_order, update_order_fulfillment, check_auth, create_checkout_session
 
 
 urlpatterns = [
@@ -15,5 +15,6 @@ urlpatterns = [
     path("orders/create/", create_order, name="create-order"),
     path("orders/<int:order_id>/fulfill/", update_order_fulfillment, name="update-order-fulfillment"),
     path("api/check-auth/", check_auth, name="check-auth"),
-     path('api-auth/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
+    path("api/create-checkout-session/", create_checkout_session, name="create-checkout-session"),
 ]
