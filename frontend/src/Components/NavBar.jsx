@@ -43,12 +43,6 @@ export const NavBar = () => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-4">
-          <Link
-            to="/search"
-            className="border border-gray-400 p-2 rounded-lg hover:bg-gray-100 transition"
-          >
-            <Search className="h-5 w-5 text-gray-700" />
-          </Link>
           {isAuthenticated ? (
             <button
               onClick={logout}

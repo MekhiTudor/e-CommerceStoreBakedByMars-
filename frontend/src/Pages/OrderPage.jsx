@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { addToCart } from "../Helpers/AddToCart";
+import { NavBar } from "../Components/NavBar";
 
 function OrderPage() {
   const [boxSize, setBoxSize] = useState(6);
@@ -129,39 +130,7 @@ function OrderPage() {
       </div>
 
       {/* Navigation */}
-      <header className="bg-white py-4 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <Button variant="outlined" color="secondary">
-            <Link to="/">Home</Link>
-          </Button>
-        </div>
-
-        <div className="absolute left-1/2 -translate-x-1/2">
-          <h1
-            className="text-4xl font-bold text-primary"
-            style={{ fontFamily: "cursive" }}
-          >
-            Baked By Mars
-          </h1>
-          <p>
-            {isAuthenticated ? "User is logged in" : "User is NOT logged in"}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button variant="outlined" color="secondary" size="small">
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button variant="outlined" color="secondary" size="small">
-            <User className="h-5 w-5" />
-          </Button>
-          <Button variant="outlined" color="secondary" size="small">
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <NavBar />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8 grid md:grid-cols-2 gap-12">

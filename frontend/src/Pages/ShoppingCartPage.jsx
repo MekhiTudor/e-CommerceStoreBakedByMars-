@@ -15,9 +15,7 @@ export const ShoppingCartPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
   // Load Stripe
-  const stripePromise = loadStripe(
-    "pk_test_51QrVsTLnkxbtY0aIsKHAzbt6WpSimAoNnSFxZy5UQXdhBihet3COMjwc2SPDDXZHUXRSHcWv6bsBRuGWNpPyW5to00KEuLiqhN"
-  );
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
   // Function to get the CSRF token
   const getCsrfToken = async () => {
