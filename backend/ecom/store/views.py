@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404, render # type: ignore
+import logging
+import traceback
 from django.http import JsonResponse , HttpResponse# type: ignore
 from .models import Product, User, Order, OrderItem, Product
 from cart.models import Cart
@@ -59,22 +61,44 @@ def login_user(request):
     On success, logs in the user and returns a success message.
     """
     try:
+        print("Received login request")
+        print(f"Request body: {request.body}")
+
         data = json.loads(request.body)
         username = data.get("username")
         password = data.get("password")
 
+        if not username or not password:
+            print("Missing username or password")
+            return JsonResponse({"error": "Username and password are required"}, status=400)
+
+        print(f"Attempting authentication for username: {username}")
+
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
+            print(f"Authentication successful for user: {user.username}")
             login(request, user)
-            # After login, the session is set and subsequent requests will have request.user populated.
-            print(f"Session ID: {request.session.session_key}")
+
+            # Debugging session information
+            session_id = request.session.session_key
+            if not session_id:
+                request.session.save()  # Ensure the session is saved
+                session_id = request.session.session_key
+            print(f"Session ID after login: {session_id}")
+
             return JsonResponse({"message": "Login successful", "user": user.username}, status=200)
         else:
+            print("Authentication failed: Invalid credentials")
             return JsonResponse({"error": "Invalid credentials"}, status=400)
-    except Exception as e:
-        print("Error during login:", e)
-        return JsonResponse({"error": "Server error"}, status=500)
 
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON payload")
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    except Exception as e:
+        print("Unexpected error during login:", e)
+        return JsonResponse({"error": "Server error"}, status=500)
 
 def logout_user(request):
     logout(request)
@@ -188,42 +212,68 @@ def serve_static_files(request, path):
     return HttpResponse("File not found", status=404)
 
 
+logger = logging.getLogger(__name__)
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@csrf_exempt  # Stripe needs to communicate with your server, so no CSRF protection is required here
+@csrf_exempt  # Stripe needs to communicate with your server, so no CSRF protection
 def create_checkout_session(request):
     user = request.user
+    logger.info(f"Starting checkout session for user: {user}")
+
     try:
-        # Get the cart items for the user (you can adjust this logic based on your cart structure)
+        # Log the incoming request data
+        logger.info(f"Request data: {request.data}")
+
+        # Get the cart items from request
         cart_items = request.data.get("items", [])
+        if not cart_items:
+            logger.error("No cart items provided in request!")
+            return JsonResponse({"error": "No cart items provided"}, status=400)
 
         line_items = []
         for item in cart_items:
-            product = Product.objects.get(id=item["product_id"])
-            line_items.append({
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': product.name,
+            try:
+                product = Product.objects.get(id=item["product_id"])
+                logger.info(f"Adding product {product.name} to checkout session.")
+                
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {'name': product.name},
+                        'unit_amount': int(product.price * 100),  # Convert price to cents
                     },
-                    'unit_amount': int(product.price * 100),  # Amount in cents
-                },
-                'quantity': item["quantity"],
-            })
-        
+                    'quantity': item["quantity"],
+                })
+            except Product.DoesNotExist:
+                logger.error(f"Product with ID {item['product_id']} not found!")
+                return JsonResponse({"error": f"Product with ID {item['product_id']} not found"}, status=400)
+            except Exception as e:
+                logger.error(f"Error fetching product: {str(e)}")
+                return JsonResponse({"error": f"Error fetching product: {str(e)}"}, status=500)
+
+        logger.info(f"Final line items for checkout: {line_items}")
+
+        # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=line_items,
             mode="payment",
-            success_url="http://localhost:3000/success",  # Redirect after successful payment
-            cancel_url="http://localhost:3000/cancel",  # Redirect after cancel
+            success_url="http://localhost:3000/success",
+            cancel_url="http://localhost:3000/cancel",
         )
 
-        return JsonResponse({
-            'id': checkout_session.id
-        })
+        logger.info(f"Checkout session created successfully: {checkout_session.id}")
+        return JsonResponse({"id": checkout_session.id})
+
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error: {str(se)}")
+        traceback.print_exc()
+        return JsonResponse({"error": f"Stripe error: {str(se)}"}, status=500)
 
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        logger.error(f"General error: {str(e)}")
+        traceback.print_exc()
+        return JsonResponse({"error": f"Internal server error: {str(e)}"}, status=500)

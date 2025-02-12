@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
+import { Form, Link, useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -8,15 +9,62 @@ export const Register = () => {
     lastName: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
   });
+
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState("");
+  const { getCsrfToken } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registering with:", formData);
+    setError(null);
+    setMessage("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const csrfToken = await getCsrfToken();
+
+      const response = await fetch("http://127.0.0.1:8000/api/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: formData.username,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone_number: formData.phone,
+          password1: formData.password,
+          password2: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Registration successful! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 2000); // Redirect after 2 seconds
+      } else {
+        setError(data.error || "Registration failed.");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+      console.error("Registration error:", err);
+    }
   };
 
   return (
@@ -66,6 +114,24 @@ export const Register = () => {
             placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
+            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
             className="p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -76,6 +142,10 @@ export const Register = () => {
             Register
           </button>
         </form>
+        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+        {message && (
+          <p className="text-green-500 text-center mt-2">{message}</p>
+        )}
         <p className="text-center text-sm mt-4">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-500 hover:underline">
