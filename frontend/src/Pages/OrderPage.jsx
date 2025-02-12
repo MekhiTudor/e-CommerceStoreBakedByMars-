@@ -131,9 +131,6 @@ function OrderPage() {
       {/* Navigation */}
       <header className="bg-white py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Button variant="contained" color="primary">
-            SHOP
-          </Button>
           <Button variant="outlined" color="secondary">
             <Link to="/">Home</Link>
           </Button>
@@ -159,8 +156,9 @@ function OrderPage() {
             <User className="h-5 w-5" />
           </Button>
           <Button variant="outlined" color="secondary" size="small">
-            <Link to="/cart"></Link>
-            <ShoppingCart className="h-5 w-5" />
+            <Link to="/cart">
+              <ShoppingCart className="h-5 w-5" />
+            </Link>
           </Button>
         </div>
       </header>

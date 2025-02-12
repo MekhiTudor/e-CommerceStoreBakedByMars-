@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CookieCard from "../Components/CookieCard";
+import { NavBar } from "../Components/NavBar";
 
 export const FlavorsPage = () => {
   const [flavors, setFlavors] = useState([]);
@@ -29,6 +30,8 @@ export const FlavorsPage = () => {
   }, []);
   console.log(flavors);
   return (
+    <>
+    <NavBar/>
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-center mb-6">Our Flavors</h1>
 
@@ -41,5 +44,6 @@ export const FlavorsPage = () => {
         ))}
       </div>
     </div>
+    </>
   );
 };

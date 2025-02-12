@@ -11,9 +11,6 @@ export const NavBar = () => {
       <div className="flex items-center w-full max-w-5xl justify-between">
         {/* Left Navigation */}
         <div className="flex items-center gap-6">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-            SHOP
-          </button>
           <Link
             to="/"
             className="border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
@@ -31,12 +28,6 @@ export const NavBar = () => {
             className="border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
           >
             Purchase
-          </Link>
-          <Link
-            to="/subscribe"
-            className="border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-          >
-            Subscribe
           </Link>
         </div>
 
