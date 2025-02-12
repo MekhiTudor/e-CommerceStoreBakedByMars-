@@ -1,11 +1,14 @@
-from django.shortcuts import get_object_or_404 # type: ignore
-from django.http import JsonResponse # type: ignore
+from django.shortcuts import get_object_or_404, render # type: ignore
+from django.http import JsonResponse , HttpResponse# type: ignore
 from .models import Product, User, Order, OrderItem, Product
 from cart.models import Cart
-
+from django.conf import settings
+from django.views.static import serve
+import stripe
 from django.contrib.auth import authenticate, login, logout # type: ignore
 from django.contrib import messages # type: ignore
 import json
+import os
 from django.contrib.auth.forms import UserCreationForm # type: ignore
 from django import forms # type: ignore
 from .forms import SignUpForm
@@ -158,3 +161,69 @@ def check_auth(request):
     if request.user.is_authenticated:
         return JsonResponse({"authenticated": True, "user": request.user.username})
     return JsonResponse({"authenticated": False})
+
+
+
+def serve_react_app(request, path=""):
+    """
+    Serves React's index.html for unknown routes.
+    """
+    frontend_path = os.path.join(settings.FRONTEND_DIR, "index.html")
+
+    if not os.path.exists(frontend_path):
+        return HttpResponse("React build not found", status=404)
+
+    with open(frontend_path, "r", encoding="utf-8") as file:
+        return HttpResponse(file.read())
+
+def serve_static_files(request, path):
+    """
+    Serve JavaScript, CSS, and other static assets properly.
+    """
+    file_path = os.path.join(settings.FRONTEND_DIR, "assets", path)
+
+    if os.path.exists(file_path):
+        return serve(request, path, document_root=os.path.join(settings.FRONTEND_DIR, "assets"))
+
+    return HttpResponse("File not found", status=404)
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@csrf_exempt  # Stripe needs to communicate with your server, so no CSRF protection is required here
+def create_checkout_session(request):
+    user = request.user
+    try:
+        # Get the cart items for the user (you can adjust this logic based on your cart structure)
+        cart_items = request.data.get("items", [])
+
+        line_items = []
+        for item in cart_items:
+            product = Product.objects.get(id=item["product_id"])
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': product.name,
+                    },
+                    'unit_amount': int(product.price * 100),  # Amount in cents
+                },
+                'quantity': item["quantity"],
+            })
+        
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=line_items,
+            mode="payment",
+            success_url="http://localhost:3000/success",  # Redirect after successful payment
+            cancel_url="http://localhost:3000/cancel",  # Redirect after cancel
+        )
+
+        return JsonResponse({
+            'id': checkout_session.id
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

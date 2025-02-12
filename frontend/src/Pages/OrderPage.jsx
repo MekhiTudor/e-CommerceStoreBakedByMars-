@@ -75,6 +75,8 @@ function OrderPage() {
         return;
       }
 
+      console.log("HERE", isAuthenticated);
+
       console.log("Preparing cookies to add to cart:", selectedCookies);
 
       // Pass the CSRF token from the context to the addToCart function
@@ -113,7 +115,7 @@ function OrderPage() {
 
   const isBoxFull = selectedCookies.length === boxSize;
   const lastAddedCookie = selectedCookies[selectedCookies.length - 1];
-
+  console.log(lastAddedCookie);
   return (
     <div className="min-h-screen bg-[#FDF5ED]">
       {/* Top Banner */}
@@ -134,9 +136,6 @@ function OrderPage() {
           </Button>
           <Button variant="outlined" color="secondary">
             <Link to="/">Home</Link>
-          </Button>
-          <Button variant="outlined" color="secondary">
-            SUBSCRIBE
           </Button>
         </div>
 
@@ -160,6 +159,7 @@ function OrderPage() {
             <User className="h-5 w-5" />
           </Button>
           <Button variant="outlined" color="secondary" size="small">
+            <Link to="/cart"></Link>
             <ShoppingCart className="h-5 w-5" />
           </Button>
         </div>
