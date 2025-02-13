@@ -1,5 +1,5 @@
-from django.conf import settings
-from django.db import models
+from django.conf import settings  # type: ignore
+from django.db import models # type: ignore
 from store.models import Product  # Adjust import based on your project structure
 
 # Updated Cart model:

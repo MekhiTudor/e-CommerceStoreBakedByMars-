@@ -1,6 +1,6 @@
 # cart/urls.py
 
-from django.urls import path
+from django.urls import path # type: ignore
 from .views import get_cart, add_to_cart, update_cart_item, remove_from_cart
 
 urlpatterns = [

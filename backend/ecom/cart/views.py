@@ -1,7 +1,7 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response  
-from rest_framework.permissions import IsAuthenticated  
-from django.views.decorators.csrf import csrf_exempt  # Import csrf_exempt
+from rest_framework.decorators import api_view, permission_classes # type: ignore
+from rest_framework.response import Response  # type: ignore
+from rest_framework.permissions import IsAuthenticated  # type: ignore
+from django.views.decorators.csrf import csrf_exempt  # Import csrf_exempt # type: ignore
 from .models import Cart, CartItem
 from store.models import Product
 from django.shortcuts import get_object_or_404  # type: ignore
