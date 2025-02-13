@@ -1,7 +1,7 @@
 from django.db import models # type:ignore
 import datetime
 from django.contrib.auth.models import AbstractUser  # type:ignore
-from django.utils.timezone import now
+from django.utils.timezone import now # type: ignore
 
 
 

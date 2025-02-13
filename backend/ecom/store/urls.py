@@ -1,6 +1,6 @@
 # store/urls.py
 
-from django.urls import path, include
+from django.urls import path, include # type: ignore
 from . import views
 from .views import get_csrf_token, login_user, create_order, update_order_fulfillment, check_auth, create_checkout_session
 

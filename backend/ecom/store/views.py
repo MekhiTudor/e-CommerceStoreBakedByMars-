@@ -4,9 +4,9 @@ import traceback
 from django.http import JsonResponse , HttpResponse# type: ignore
 from .models import Product, User, Order, OrderItem, Product
 from cart.models import Cart
-from django.conf import settings
-from django.views.static import serve
-import stripe
+from django.conf import settings # type: ignore
+from django.views.static import serve # type: ignore
+import stripe # type: ignore
 from django.contrib.auth import authenticate, login, logout # type: ignore
 from django.contrib import messages # type: ignore
 import json
@@ -17,11 +17,11 @@ from .forms import SignUpForm
 from django.middleware.csrf import get_token # type: ignore
 from django.views.decorators.csrf import csrf_exempt  # type: ignore
 from django.views.decorators.csrf import ensure_csrf_cookie  # type: ignore
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.decorators import user_passes_test
+from rest_framework import status # type: ignore
+from rest_framework.response import Response # type: ignore
+from rest_framework.decorators import api_view, permission_classes # type: ignore
+from rest_framework.permissions import IsAuthenticated # type: ignore
+from django.contrib.auth.decorators import user_passes_test # type: ignore
 from .serializers import OrderSerializer
 
 # Create your views here.
