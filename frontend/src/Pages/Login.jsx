@@ -1,13 +1,13 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
-import { Form, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { NavBar } from "../Components/NavBar";
 
 export const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const { setIsAuthenticated } = useContext(AuthContext);
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,93 +15,146 @@ export const Login = () => {
   };
 
   const getCsrfToken = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/csrf/", {
-      credentials: "include", // Ensure cookies are sent
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/csrf/", {
+        credentials: "include",
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        throw new Error("Failed to fetch CSRF token");
+      }
+
+      const data = await response.json();
+
+      return data.csrfToken;
+    } catch (error) {
+      console.error("Error fetching CSRF token:", error);
       throw new Error("Failed to fetch CSRF token");
     }
-
-    const data = await response.json();
-    console.log("CSRF Token:", data.csrfToken);
-    return data.csrfToken;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setMessage("");
 
     try {
+      console.log(formData);
       const csrfToken = await getCsrfToken();
-      console.log("CSRF Token Retrieved:", csrfToken);
-      //console.log(JSON.stringify(formData));
+      console.log(await csrfToken);
       const response = await fetch("http://127.0.0.1:8000/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken, // Include CSRF token
+          "X-CSRFToken": csrfToken,
         },
-        credentials: "include", // Include cookies for authentication
-
         body: JSON.stringify(formData),
       });
-      console.log(response);
-      const data = await response.json();
 
-      if (response.ok) {
-        setIsAuthenticated(true); // Set global auth state to true
-        navigate("/");
-        console.log("Login successful:", data);
-      } else {
-        //console.error("Error:", data.error);
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error);
+        return;
       }
-    } catch (err) {
-      console.error("Request failed:", err);
-      //console.log();
+
+      const data = await response.json();
+      setIsAuthenticated(true);
+      setMessage(data.message);
+      navigate("/");
+    } catch (error) {
+      setError("An unexpected error occurred.");
+      console.error("Error during login:", error);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"
-          >
-            Login
-          </button>
-        </form>
-        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-        {message && (
-          <p className="text-green-500 text-center mt-2">{message}</p>
-        )}
-        <p className="text-center text-sm mt-4">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-blue-500 hover:underline">
-            Sign up
-          </Link>
-        </p>
+    <>
+      <NavBar />
+      <div className="min-h-[1000px] min-w-[1500px] flex items-center justify-center bg-[#FDEED9] px-4 py-12">
+        <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+          <div className="flex flex-col items-center">
+            <img
+              alt="Your Company"
+              src="http://127.0.0.1:8000/media/uploads/product/cookieIcon.png"
+              className="h-16 w-auto"
+            />
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[#573C27]">
+              Sign in to your account
+            </h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            <div className="space-y-6">
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Username
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-[#573C27]"
+                  >
+                    Password
+                  </label>
+                  <div className="text-sm">
+                    <a
+                      href="#"
+                      className="font-semibold text-[#E34989] hover:text-[#FFADC6] transition-colors"
+                    >
+                      Forgot password?
+                    </a>
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-[#E34989] px-4 py-3 text-center font-semibold text-white shadow-sm hover:bg-[#FFADC6] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] focus:ring-offset-2 transition-all duration-200"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Not a member?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-[#E34989] hover:text-[#FFADC6] transition-colors"
+            >
+              Create an account
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

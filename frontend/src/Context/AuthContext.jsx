@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [csrfToken, setCsrfToken] = useState(null);
 
-  // Fetch CSRF Token and store it in context
   const getCsrfToken = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/csrf/", {
@@ -19,7 +18,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      setCsrfToken(data.csrfToken); // Store the CSRF token in context
+      setCsrfToken(data.csrfToken);
       return data.csrfToken;
     } catch (error) {
       console.error("Error fetching CSRF token:", error);
@@ -27,9 +26,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Check authentication status on app load
+  const logout = async () => {
+    try {
+      let token = await getCsrfToken();
+      console.log(token);
+      const response = await fetch("http://127.0.0.1:8000/api/logout/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": token, // Include CSRF token if needed
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to log out");
+      }
+
+      setIsAuthenticated(false); // Update state to reflect the user is logged out
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   useEffect(() => {
-    // Example logic to check if the user is authenticated
     const checkAuth = async () => {
       const response = await fetch("http://127.0.0.1:8000/api/check-auth/", {
         credentials: "include",
@@ -43,7 +63,13 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, csrfToken, getCsrfToken, setIsAuthenticated }}
+      value={{
+        isAuthenticated,
+        csrfToken,
+        getCsrfToken,
+        setIsAuthenticated,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

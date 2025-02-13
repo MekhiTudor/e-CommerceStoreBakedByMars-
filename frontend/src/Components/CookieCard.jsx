@@ -13,10 +13,9 @@ export default function CookieCard(cookie) {
       />
       <div class="card__content | flow">
         <div class="card__content--container | flow">
-          <h2 class="card__title">{cookie.name}</h2>
+          <h1 class="card__title">{cookie.name}</h1>
           <ReactMarkdown>{cookie.description}</ReactMarkdown>
         </div>
-        <button class="card__button">Read more</button>
       </div>
     </article>
   );

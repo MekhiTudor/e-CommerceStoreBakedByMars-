@@ -162,11 +162,26 @@ export const ShoppingCartPage = () => {
 
   if (loading) return <p>Loading cart...</p>;
   if (error) return <p>{error}</p>;
+  if (!cart || cart?.items.length === 0)
+    return (
+      <>
+        <NavBar />
+
+        <div className="text-center">
+          <h1
+            className="pl-[420px] text-4xl font-bold text-[#E34989]"
+            style={{ fontFamily: "Bagel Fat One" }}
+          >
+            Add Something to your cart!
+          </h1>
+        </div>
+      </>
+    );
 
   return (
     <>
       <NavBar />
-      <div className="container mx-auto p-6">
+      <div className="pl-[520px] container mx-auto p-6">
         <p>{isAuthenticated ? "User is logged in" : "User is NOT logged in"}</p>
         <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
         <div className="bg-white p-4 rounded-lg shadow-md">
@@ -177,7 +192,7 @@ export const ShoppingCartPage = () => {
             >
               <div>
                 <h2 className="text-lg font-semibold">
-                  {item?.product_name || "Unnamed Product"}
+                  {item?.product_name || "Unnamed Product"} Cookies
                 </h2>
                 <p>${Number(item?.product_price).toFixed(2)}</p>
               </div>
@@ -233,10 +248,7 @@ export const ShoppingCartPage = () => {
           </div>
         </div>
 
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={handleCheckout}
-        >
+        <button className="mt-[20px] rounded" onClick={handleCheckout}>
           Continue to Checkout
         </button>
       </div>

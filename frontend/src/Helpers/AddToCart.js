@@ -17,17 +17,13 @@ export const addToCart = async (
 
   try {
     // If CSRF token is not available, fetch a new one
-    let token = csrfToken;
-    if (!token) {
-      console.log("CSRF token not provided, fetching a new one...");
-      token = await getCsrfToken(); // Fallback to fetching a new CSRF token if not present
-    }
 
-    console.log("Using CSRF token:", token);
+    console.log("CSRF token not provided, fetching a new one...");
+    let token = await getCsrfToken(); // Fallback to fetching a new CSRF token if not present
 
     const payloadItems = Array.isArray(items) ? items : [items];
-    console.log("Payload items:", payloadItems[0]);
-    console.log("what im sending back:", JSON.stringify(payloadItems[0]));
+
+    // Ensure the CSRF token is being sent correctly with the request
     const response = await fetch("http://127.0.0.1:8000/api/cart/add/", {
       method: "POST",
       headers: {
@@ -35,12 +31,11 @@ export const addToCart = async (
         "X-CSRFToken": token,
       },
       body: JSON.stringify(payloadItems),
-      credentials: "include", // Include session cookies
+      credentials: "include", // Ensure session cookies are included
     });
 
     console.log("Response status:", response.status);
     console.log("Response headers:", response.headers);
-    console.log();
 
     if (!response.ok) {
       const errorDetails = await response.text();

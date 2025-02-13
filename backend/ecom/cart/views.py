@@ -18,9 +18,10 @@ def get_cart(request):
     return JsonResponse(serializer.data, safe=False)
 
 # This view adds one or more items to the logged-in user's cart.
+
+# @csrf_exempt  # Exempt CSRF check for this view
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@csrf_exempt  # Exempt CSRF check for this view
 def add_to_cart(request):
     """
     Expects a JSON payload with either:

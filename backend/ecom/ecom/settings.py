@@ -157,6 +157,6 @@ CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
 CSRF_USE_SESSIONS = True  # Django should send CSRF as a cookie
 CSRF_COOKIE_DOMAIN = "127.0.0.1"
 CSRF_COOKIE_NAME = "csrftoken"
-CSRF_COOKIE_SAMESITE = "None" 
+CSRF_COOKIE_SAMESITE = "Lax" 
 SESSION_COOKIE_HTTPONLY = True
 
