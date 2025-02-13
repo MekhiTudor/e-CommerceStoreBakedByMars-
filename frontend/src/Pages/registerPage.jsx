@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import { Form, Link, useNavigate } from "react-router-dom";
+import { NavBar } from "../Components/NavBar";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -68,91 +69,174 @@ export const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"
-          >
-            Register
-          </button>
-        </form>
-        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
-        {message && (
-          <p className="text-green-500 text-center mt-2">{message}</p>
-        )}
-        <p className="text-center text-sm mt-4">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-500 hover:underline">
-            Login
-          </Link>
-        </p>
+    <>
+      <NavBar />
+      <div className="min-h-[1000px] min-w-[1700px] flex items-center justify-center bg-[#FDEED9] px-4 py-12">
+        <div className="my-[100px] w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
+          <div className="flex flex-col items-center">
+            <img
+              alt="Your Company"
+              src="http://127.0.0.1:8000/media/uploads/product/cookieIcon.png"
+              className="h-16 w-auto"
+            />
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[#573C27]">
+              Create an account
+            </h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-[#573C27]"
+                >
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-[#A98360] px-4 py-3 text-[#573C27] placeholder:text-gray-400 focus:border-[#E34989] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] transition-all duration-200"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-[#E34989] px-4 py-3 text-center font-semibold text-white shadow-sm hover:bg-[#FFADC6] focus:outline-none focus:ring-2 focus:ring-[#FFADC6] focus:ring-offset-2 transition-all duration-200"
+            >
+              Register
+            </button>
+          </form>
+
+          {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+          {message && (
+            <p className="text-green-500 text-center mt-2">{message}</p>
+          )}
+
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-[#E34989] hover:text-[#FFADC6] transition-colors"
+            >
+              Login
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

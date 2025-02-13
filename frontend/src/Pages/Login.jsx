@@ -70,7 +70,7 @@ export const Login = () => {
   return (
     <>
       <NavBar />
-      <div className="min-h-[1000px] min-w-[1500px] flex items-center justify-center bg-[#FDEED9] px-4 py-12">
+      <div className="min-h-[1000px] min-w-[1700px] flex items-center justify-center bg-[#FDEED9] px-4 py-12">
         <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg">
           <div className="flex flex-col items-center">
             <img
